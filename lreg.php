@@ -9,45 +9,21 @@ Plugin URI: http://www.pgogy.com/code/learning-registry-widget
 Author URI: http://www.pgogy.com
 License: GPL
 */
- 
-require_once( 'lreg_ajax.php' ); 
 
-add_action("wp_head","lr_add_scripts");		
-	
-function lr_add_scripts(){
-	
-	?><script type='text/javascript' src='<?PHP echo site_url(); ?>/wp-includes/js/jquery/jquery.js'></script>
-	<script type="text/javascript" language="javascript">
+require_once( 'lreg_ajax.php' );
 
-	var ajaxurl = '<?PHP echo site_url(); ?>/wp-admin/admin-ajax.php';		
+/**
+ * Enqueue scripts
+ */
+function lr_enqueue_scripts() {
+        wp_enqueue_script( 'jquery' );
+        wp_enqueue_script( 'learning-registry', WP_PLUGIN_URL . '/learning-registry-widget/lr.js', array( 'jquery' ) );
 
-	function lreg_call(post, div, url, items){
-		
-		jQuery(document).ready(function($) {
-								
-				var data = {
-					action: 'lreg_search',
-					node_url: url,
-					term:post,
-					max:items
-				};		
-						
-				jQuery.post(ajaxurl, data, 
-							
-				function(response){
-				
-					alert(response);
-				
-					document.getElementById(div).innerHTML = response;
-								
-				});
-								
-		});
-			
-	}</script><?PHP
-	
+        wp_localize_script( 'learning-registry', 'LR', array(
+                'ajaxurl' => site_url() . '/wp-admin/admin-ajax.php'
+        ) );
 }
- 
+add_action( 'wp_enqueue_scripts', 'lr_enqueue_scripts' );
 
 function learning_registry_widget_display() {
 	require_once( 'lreg_class.php' );
